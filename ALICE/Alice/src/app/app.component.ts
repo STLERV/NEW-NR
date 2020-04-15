@@ -6,6 +6,8 @@ import * as big from 'bigint-crypto-utils';
 import * as bigconv from 'bigint-conversion';
 import {MensajeService} from '../app/service';
 import { dashCaseToCamelCase } from '@angular/compiler/src/util';
+import * as paillier from 'paillier-bigint';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -23,6 +25,13 @@ export class AppComponent {
   Keyexport: any;
   iv : any;
   
+  serverPublicKeyPai: paillier.PublicKey;
+  publicKeyPai: paillier.PublicKey;
+  privateKeyPai: paillier.PrivateKey;
+
+  n1: string;
+  n2: string;
+  suma: string;
 
 
 
@@ -35,7 +44,8 @@ export class AppComponent {
    
    this.dameClaveTTP();
    
-
+   this.dameclavesPai();
+   this.dameClavePai();
 
 
   }
@@ -45,6 +55,38 @@ export class AppComponent {
 
   }
 
+  sumar(numero1, numero2){
+
+
+    console.log(numero1,numero2)
+
+    var n1 : any = bigconv.textToBigint(numero1)
+    var n2 : any = bigconv.textToBigint(numero2)
+
+    console.log(n1,n2)
+
+    var cn1 = this.serverPublicKeyPai.encrypt(n1);
+    var cn2 = this.serverPublicKeyPai.encrypt(n2);
+
+    this.n1 = bigconv.bigintToHex(cn1);
+    this.n2 = bigconv.bigintToHex(cn2);
+
+
+    console.log(n1,n2)
+
+    var body = {
+      c1: this.n1,
+      c2: this.n2      
+    }
+
+    this.mensajeService.send(body).subscribe((res:any) =>{
+      this.suma = bigconv.bigintToText(bigconv.hexToBigint(res.suma));
+      console.log(bigconv.bigintToText(bigconv.hexToBigint(res.suma)))
+    })
+
+
+
+  }
 
   dameClave() {
     this.mensajeService.dameClave().subscribe((res: any) => {
@@ -58,6 +100,22 @@ export class AppComponent {
 
     
   }
+
+  dameClavePai(){
+
+    this.mensajeService.dameclavesPai().subscribe((res:any) => {
+      this.serverPublicKeyPai = new paillier.PublicKey(bigconv.hexToBigint(res.n),bigconv.hexToBigint(res.g));
+    });
+
+  }
+
+
+
+async dameclavesPai() {
+  const { publicKey, privateKey } = await paillier.generateRandomKeysSync(3072);
+  this.publicKeyPai = publicKey;
+  this.privateKeyPai = privateKey;
+}
 
   dameClaveTTP(){
 

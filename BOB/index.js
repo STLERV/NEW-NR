@@ -2,6 +2,7 @@ const express = require("express");
 const rsa = require('../../rsaul/rsa-cybersecurity');
 const sha = require('object-sha');
 const request = require('request');
+const paillierBigint = require('paillier-bigint');
 
 const app = express();
 const morgan = require('morgan');
@@ -31,16 +32,48 @@ const ___dirname = path.resolve();
 global.puKey;
 global.prKey;
 global.Key;
+global.puKeyPai;
+global.prKeyPai;
 
 async function claves() {
   const { publicKey, privateKey } = await rsa.generateRandomKeys(3072);
-
+  const paillierKeyPair = await paillierBigint.generateRandomKeysSync(3072);
   puKey = publicKey;
   prKey = privateKey;
+  puKeyPai = paillierKeyPair.publicKey;
+  prKeyPai = paillierKeyPair.privateKey;
+
 
 };
 
+app.get('/keypai', (req, res) => {
 
+  class PublicKey {
+    constructor(n, g) {
+      this.n = bigconv.bigintToHex(n);
+      this.g = bigconv.bigintToHex(g);
+    }
+  }
+
+  publicKey = new PublicKey(
+    puKeyPai.n,
+    puKeyPai.g
+  )
+
+  res.status(200).send(publicKey);
+
+});
+
+app.post("/suma", (req, res) => {
+
+ 
+  sumaCifrada = bigconv.bigintToHex(prKeyPai.decrypt(puKeyPai.addition(bigconv.hexToBigint(req.body.c1),bigconv.hexToBigint(req.body.c2))));
+
+  const cosas = {
+    suma: sumaCifrada
+  }
+  res.status(200).send(cosas);
+});
 
 app.get('/key', (req, res) => {
 

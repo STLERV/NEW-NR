@@ -41,4 +41,12 @@ export class MensajeService {
     return this.http.get(this.URLBob + '/key');
   }
 
+  dameclavesPai() {
+    return this.http.get(this.URLBob + '/keypai');
+
+  }
+  send(body){
+    return this.http.post(this.URLBob + '/suma', body);
+  }
+
 }

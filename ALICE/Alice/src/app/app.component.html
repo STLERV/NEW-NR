@@ -8,3 +8,12 @@
   </div>
   <button type="button" (click) = "enviarMensaje(titleInput.value)" class="btn btn-primary">Envia!</button>
 </div>
+<h3>Pailler:</h3>
+<div class="container">
+  <div class="form-group">
+   <label for="usr">Envia tu suma:</label>
+   <input type="text" #numero1 class="form-control">
+   <input type="text" #numero2 class="form-control">
+   </div>
+   <button type="button" (click) = "sumar(numero1.value, numero2.value)" class="btn btn-primary">SUMAME :) !</button>
+ </div>
