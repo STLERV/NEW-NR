@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { compileNgModuleFromRender2 } from '@angular/compiler/src/render3/r3_module_compiler';
 import * as sha from 'object-sha';
+import * as sss from 'shamirs-secret-sharing';
 import * as rsa from '../../../../../rsaul/rsa-cybersecurity';
 import * as big from 'bigint-crypto-utils';
 import * as bigconv from 'bigint-conversion';
@@ -33,7 +34,13 @@ export class AppComponent {
   n2: string;
   suma: string;
 
+//shami
 
+shares: any;
+  s1: any;
+  s2: any;
+  s3: any;
+  secret: any;
 
 
   async ngOnInit(){
@@ -44,8 +51,12 @@ export class AppComponent {
    
    this.dameClaveTTP();
    
+
+//PAI
+
    this.dameclavesPai();
    this.dameClavePai();
+   this.dameSecretSplit()
 
 
   }
@@ -54,6 +65,40 @@ export class AppComponent {
   constructor(private mensajeService: MensajeService) {
 
   }
+
+
+  dameSecretSplit() {
+
+    this.mensajeService.dameSecretSplit().subscribe((res: any) => {
+      this.shares = res.respuestaServidor
+      this.s1 = bigconv.bufToHex(this.shares[0].data);
+      this.s2 = bigconv.bufToHex(this.shares[1].data);
+      this.s3 = bigconv.bufToHex(this.shares[2].data);
+      console.log(this.shares);
+    })
+  }
+
+
+  shamir(){
+
+    var array = []
+    array.push(this.s1);
+    array.push(this.s2);
+    array.push(this.s3);
+
+    console.log(this.s1,this.s2,this.s3)
+
+    
+    this.mensajeService.dameShamirKey(array).subscribe((res: any) => {
+      this.secret = bigconv.bufToText(res.respuestaServidor.data);
+      console.log(bigconv.bufToText(this.secret.data));
+    })
+
+    console.log(this.secret);
+
+  }
+
+
 
   sumar(numero1, numero2){
 
@@ -88,6 +133,11 @@ export class AppComponent {
 
   }
 
+  ///////////////////////////////////////////////////////////
+
+
+
+
   dameClave() {
     this.mensajeService.dameClave().subscribe((res: any) => {
       this.serverPublicKey = new rsa.PublicKey(bigconv.hexToBigint(res.e), bigconv.hexToBigint(res.n))
@@ -100,7 +150,7 @@ export class AppComponent {
 
     
   }
-
+///
   dameClavePai(){
 
     this.mensajeService.dameclavesPai().subscribe((res:any) => {
@@ -116,7 +166,7 @@ async dameclavesPai() {
   this.publicKeyPai = publicKey;
   this.privateKeyPai = privateKey;
 }
-
+/////
   dameClaveTTP(){
 
     this.mensajeService.dameClaveTTP().subscribe((res: any) => {
@@ -167,9 +217,7 @@ this.Keyexport =  exportKeyData;
 await crypto.subtle.encrypt(
   {
       name: "AES-CBC",
-      //Don't re-use initialization vectors!
-      //Always generate a new iv every time your encrypt!
-      iv,
+       iv,
   },
   this.key, //from generateKey or importKey above
   messageBuffer //ArrayBuffer of data you want to encrypt
@@ -225,7 +273,8 @@ console.log(as);
     const iv =  bigconv.bigintToHex(this.iv);
     console.log(this.publicKey)
 
-    this.mensajeService.enviarMensaje3({body, pko, e, n})
+//////////////////////////
+    this.mensajeService.enviarMensaje3({body, pko, e, n, iv})
 
     
 .subscribe(async (res: any) => {

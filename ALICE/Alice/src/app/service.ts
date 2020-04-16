@@ -48,5 +48,11 @@ export class MensajeService {
   send(body){
     return this.http.post(this.URLBob + '/suma', body);
   }
+  dameSecretSplit() {
+    return this.http.get(this.URLBob + '/shamir');
+  }
 
+  dameShamirKey(shares) {
+    return this.http.post(this.URLBob + '/getShamirKey', shares);
+  }
 }

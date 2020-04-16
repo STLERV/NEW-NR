@@ -74,7 +74,10 @@ app.post("/mensaje3", async (req, res) => {
 
   
     Key = req.body.mensaje.body.msg;
-    iv= req.body.mensaje.body.iv;
+    
+    iv= req.body.mensaje.iv;
+
+    console.log("IV 1:" + iv);
     console.log(Key);
      
     const body = {
@@ -124,6 +127,6 @@ app.get('/claveparabob', (req, res) => {
 
   res.status(200).send({key: Key, iv: iv})
     console.log(Key);
-
+    console.log(iv);
   });
    
